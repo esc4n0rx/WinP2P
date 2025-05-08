@@ -82,7 +82,12 @@ class Client(QThread):
             
         try:
             if isinstance(message, str):
+                # Adicionar terminador de linha para todas as mensagens
+                if not message.endswith('\n'):
+                    message = message + '\n'
                 message = message.encode()
+            elif isinstance(message, bytes) and not message.endswith(b'\n'):
+                message = message + b'\n'
                 
             self.sock.send(message)
             return True

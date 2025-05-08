@@ -272,6 +272,8 @@ class MainWindow(QMainWindow):
         """Chamado quando cliente se conecta com sucesso"""
         self.peer_connected = True
         self.conn_status.setText("Conectado: Sim")
+        
+        self.send_system_message("user_join", {"username": self.config['username']})
     
     def on_disconnected(self):
         """Chamado quando cliente é desconectado"""
@@ -315,14 +317,20 @@ class MainWindow(QMainWindow):
             msg_obj = json.loads(data)
             
             
+            # Processa mensagem de chat
             if msg_obj.get("type") == "chat":
-               
                 content = msg_obj.get("content", "")
+                username = msg_obj.get("username", "Anônimo")
+                
+                # Descriptografa se necessário
                 if self.encrypted and "encrypted" in msg_obj:
-                    content = decrypt_message(content)
+                    try:
+                        content = decrypt_message(content)
+                    except Exception as e:
+                        print(f"Erro ao descriptografar: {e}")
                 
-                self.display_message(msg_obj.get("username", "Anônimo"), content)
-                
+                # Exibe a mensagem na interface
+                self.display_message(username, content)
             elif msg_obj.get("type") == "user_join":
 
                 username = msg_obj.get("data", {}).get("username", "Anônimo")
