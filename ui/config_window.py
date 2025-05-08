@@ -16,16 +16,13 @@ class ConfigWindow(QMainWindow):
         self.setWindowTitle('Configurações')
         self.resize(400, 500)
 
-        # Aplicar tema atual às configurações
         if 'theme' in config:
             self.setStyleSheet(THEMES.get(config['theme'], ''))
 
-        # Widget central e layout principal
         central = QWidget()
         self.setCentralWidget(central)
         main_layout = QVBoxLayout(central)
         
-        # Título
         title = QLabel("Configurações do Chat")
         title.setAlignment(Qt.AlignCenter)
         font = QFont()
@@ -34,7 +31,6 @@ class ConfigWindow(QMainWindow):
         title.setFont(font)
         main_layout.addWidget(title)
         
-        # Grupo: Perfil do usuário
         profile_group = QGroupBox("Perfil do Usuário")
         profile_layout = QFormLayout(profile_group)
         
@@ -42,14 +38,12 @@ class ConfigWindow(QMainWindow):
         self.avatar_color = QPushButton("Escolher Cor")
         self.avatar_color.clicked.connect(self.choose_color)
         
-        # Define a cor do avatar (cor padrão se não existir)
         self.current_color = config.get('avatar_color', '#1E88E5')
         self.avatar_color.setStyleSheet(f"background-color: {self.current_color}")
         
         profile_layout.addRow('Nome de Usuário:', self.username)
         profile_layout.addRow('Cor do Avatar:', self.avatar_color)
         
-        # Grupo: Rede
         network_group = QGroupBox("Configurações de Rede")
         network_layout = QFormLayout(network_group)
         
@@ -65,7 +59,6 @@ class ConfigWindow(QMainWindow):
         network_layout.addRow('Porta:', self.port)
         network_layout.addRow('Timeout de Conexão:', self.timeout)
         
-        # Grupo: Interface
         ui_group = QGroupBox("Interface")
         ui_layout = QFormLayout(ui_group)
         
@@ -89,7 +82,6 @@ class ConfigWindow(QMainWindow):
         ui_layout.addRow('Mostrar Horários:', self.show_timestamps)
         ui_layout.addRow('Efeitos Sonoros:', self.sound_effects)
         
-        # Grupo: Segurança
         security_group = QGroupBox("Segurança")
         security_layout = QFormLayout(security_group)
         
@@ -103,7 +95,6 @@ class ConfigWindow(QMainWindow):
         security_layout.addRow('Criptografia:', self.encryption)
         security_layout.addRow('Senha da Sala:', self.room_password)
         
-        # Botões de ação
         btn_layout = QHBoxLayout()
         
         self.btn_reset = QPushButton("Restaurar Padrões")
@@ -118,15 +109,12 @@ class ConfigWindow(QMainWindow):
         btn_layout.addStretch()
         btn_layout.addWidget(self.btn_cancel)
         btn_layout.addWidget(self.btn_save)
-        
-        # Adicionar todos os grupos ao layout principal
         main_layout.addWidget(profile_group)
         main_layout.addWidget(network_group)
         main_layout.addWidget(ui_group)
         main_layout.addWidget(security_group)
         main_layout.addLayout(btn_layout)
         
-        # Conectar sinal do tema para atualização ao vivo
         self.theme.currentTextChanged.connect(self.preview_theme)
     
     def preview_theme(self, theme_name):
@@ -155,7 +143,6 @@ class ConfigWindow(QMainWindow):
             'room_password': ''
         }
         
-        # Atualizar widgets
         self.username.setText(default_config['username'])
         self.port.setValue(default_config['port'])
         self.theme.setCurrentText(default_config['theme'])
@@ -168,12 +155,10 @@ class ConfigWindow(QMainWindow):
         self.avatar_color.setStyleSheet(f"background-color: {self.current_color}")
         self.room_password.setText(default_config['room_password'])
         
-        # Aplicar tema padrão
         self.setStyleSheet(THEMES.get(default_config['theme'], ''))
     
     def save(self):
         """Salvar configurações no arquivo config.json"""
-        # Atualizar objeto de configuração
         self.config['username'] = self.username.text().strip() or 'User'
         self.config['port'] = self.port.value()
         self.config['theme'] = self.theme.currentText()
@@ -185,11 +170,9 @@ class ConfigWindow(QMainWindow):
         self.config['avatar_color'] = self.current_color
         self.config['room_password'] = self.room_password.text()
         
-        # Salvar no arquivo
         try:
             with open('config.json', 'w') as f:
                 json.dump(self.config, f, indent=4)
             self.close()
         except Exception as e:
             print(f"Erro ao salvar configurações: {e}")
-            # Aqui poderia ser exibido um diálogo de erro

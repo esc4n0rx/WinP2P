@@ -15,16 +15,13 @@ class AboutWindow(QMainWindow):
         self.setCentralWidget(central)
         layout = QVBoxLayout(central)
         
-        # Título
         title_layout = QHBoxLayout()
         
-        # Logo placeholder - poderia ser substituído por um ícone real
         logo = QLabel()
         logo_pixel = QPixmap(64, 64)
         logo_pixel.fill(Qt.transparent)
         logo.setPixmap(logo_pixel)
         
-        # Título e versão
         title_text = QLabel('<h1>WinP2P</h1><h3>Versão 0.1</h3>')
         title_text.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         
@@ -32,10 +29,8 @@ class AboutWindow(QMainWindow):
         title_layout.addWidget(title_text)
         title_layout.addStretch()
         
-        # Abas de informação
         tabs = QTabWidget()
         
-        # Aba: Sobre
         about_tab = QWidget()
         about_layout = QVBoxLayout(about_tab)
         
@@ -60,7 +55,6 @@ class AboutWindow(QMainWindow):
         
         about_layout.addWidget(about_text)
         
-        # Aba: Recursos
         features_tab = QWidget()
         features_layout = QVBoxLayout(features_tab)
         
@@ -92,7 +86,6 @@ class AboutWindow(QMainWindow):
         
         features_layout.addWidget(features_text)
         
-        # Aba: Tecnologias
         tech_tab = QWidget()
         tech_layout = QVBoxLayout(tech_tab)
         
@@ -116,16 +109,16 @@ class AboutWindow(QMainWindow):
         
         tech_layout.addWidget(tech_text)
         
-        # Adicionar todas as abas
+
         tabs.addTab(about_tab, "Sobre")
         tabs.addTab(features_tab, "Recursos")
         tabs.addTab(tech_tab, "Tecnologias")
         
-        # Botão de fechar na parte inferior
+
         btn_close = QPushButton("Fechar")
         btn_close.clicked.connect(self.close)
         
-        # Adicionar todos os widgets ao layout principal
+
         layout.addLayout(title_layout)
         layout.addWidget(tabs)
         layout.addWidget(btn_close, alignment=Qt.AlignRight)

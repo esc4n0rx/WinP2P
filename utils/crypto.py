@@ -2,11 +2,8 @@ from cryptography.fernet import Fernet
 import base64
 import os
 
-# Chave estática para desenvolvimento
-# Em produção, a chave seria trocada durante o handshake inicial
 CRYPTO_KEY = b'vwP2g-Sq4qzcZk51wuz94JO7l_zMbHwh8vc9Ly8pSw8='
 
-# Inicializar o objeto Fernet com a chave
 _fernet = Fernet(CRYPTO_KEY)
 
 def generate_key():
@@ -25,7 +22,7 @@ def encrypt_message(message):
     
     try:
         token = _fernet.encrypt(message)
-        return token.decode('utf-8')  # Retorna como string
+        return token.decode('utf-8') 
     except Exception as e:
         print(f"Encryption error: {e}")
         return message.decode('utf-8') if isinstance(message, bytes) else message
@@ -37,7 +34,7 @@ def decrypt_message(token):
     
     try:
         message = _fernet.decrypt(token)
-        return message.decode('utf-8')  # Retorna como string
+        return message.decode('utf-8')
     except Exception as e:
         print(f"Decryption error: {e}")
         return token.decode('utf-8') if isinstance(token, bytes) else token

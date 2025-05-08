@@ -21,7 +21,6 @@ class ChatBubble(QFrame):
         self.setFrameShape(QFrame.StyledPanel)
         self.setFrameShadow(QFrame.Raised)
         
-        # Estilo base para todas as bolhas
         self.setStyleSheet("""
             QFrame {
                 border-radius: 10px;
@@ -30,27 +29,26 @@ class ChatBubble(QFrame):
             }
         """)
         
-        # Layout da bolha
+
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 5, 10, 5)
         
-        # Nome do usuário (em negrito)
+
         name_label = QLabel(f"<b>{username}</b>")
         
-        # Texto da mensagem
+
         msg_label = QLabel(message)
         msg_label.setWordWrap(True)
         
-        # Timestamp
+
         time_label = QLabel(time.strftime("%H:%M"))
         time_label.setStyleSheet("color: #666; font-size: 8pt;")
         
-        # Adicionar widgets ao layout
+
         layout.addWidget(name_label)
         layout.addWidget(msg_label)
         layout.addWidget(time_label, alignment=Qt.AlignRight)
         
-        # Definir estilos diferentes para mensagens próprias vs. outros
         if is_own:
             self.setStyleSheet("""
                 QFrame {
@@ -78,12 +76,10 @@ class UserListItem(QWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(5, 5, 5, 5)
         
-        # Status indicator (circle)
         self.status_indicator = QLabel()
         self.status_indicator.setFixedSize(10, 10)
         self.set_status(status)
         
-        # Username
         self.username_label = QLabel(username)
         
         layout.addWidget(self.status_indicator)
@@ -116,23 +112,19 @@ class MainWindow(QMainWindow):
         self.resize(800, 600)
         self.setStyleSheet(THEMES.get(config.get('theme', 'XP'), ''))
         
-        # Estado de digitação e timer
         self.is_typing = False
         self.typing_timer = QTimer()
         self.typing_timer.timeout.connect(self.stop_typing)
         self.typing_signal.connect(self.send_typing_status)
         
-        # Lista de usuários conectados (incluindo a si mesmo)
         self.users = {config['username']: "online"}
-        self.max_users = 2  # Limitar a 2 usuários (peer-to-peer)
+        self.max_users = 2  
         self.encrypted = True
         
-        # Configurar layout principal
         central = QWidget()
         self.setCentralWidget(central)
         main_layout = QHBoxLayout(central)
         
-        # Área de lista de usuários (lado esquerdo)
         users_frame = QFrame()
         users_frame.setFrameShape(QFrame.StyledPanel)
         users_layout = QVBoxLayout(users_frame)
@@ -151,19 +143,16 @@ class MainWindow(QMainWindow):
         users_layout.addWidget(self.users_list)
         users_layout.addWidget(room_info)
         
-        # Status da conexão
         self.conn_status = QLabel("Conectado: Não")
         self.encryption_status = QLabel("Criptografia: Ativada")
         
         users_layout.addWidget(self.conn_status)
         users_layout.addWidget(self.encryption_status)
         
-        # Área do chat (lado direito)
         chat_frame = QFrame()
         chat_frame.setFrameShape(QFrame.StyledPanel)
         chat_layout = QVBoxLayout(chat_frame)
         
-        # Área de mensagens com rolagem
         self.chat_area = QScrollArea()
         self.chat_area.setWidgetResizable(True)
         self.chat_widget = QWidget()
@@ -172,7 +161,6 @@ class MainWindow(QMainWindow):
         self.chat_layout.addStretch()
         self.chat_area.setWidget(self.chat_widget)
         
-        # Área de entrada
         input_frame = QFrame()
         input_layout = QHBoxLayout(input_frame)
         
@@ -191,43 +179,39 @@ class MainWindow(QMainWindow):
         chat_layout.addWidget(self.typing_label)
         chat_layout.addWidget(input_frame)
         
-        # Adicionar os frames ao layout principal com splitter
         splitter = QSplitter(Qt.Horizontal)
         splitter.addWidget(users_frame)
         splitter.addWidget(chat_frame)
         splitter.setSizes([200, 600])
         main_layout.addWidget(splitter)
         
-        # Elementos de rede
         self.server = None
         self.client = None
         self.peer_connected = False
         
-        # Iniciar servidor ou cliente
         if new_room:
             self.start_server()
         else:
             self.join_room()
             
-        # Timer para verificar conexão periodicamente
         self.conn_timer = QTimer()
         self.conn_timer.timeout.connect(self.check_connection)
-        self.conn_timer.start(5000)  # A cada 5 segundos
+        self.conn_timer.start(5000) 
     
     def start_server(self):
         """Inicia o servidor e gera código da sala"""
         port = self.config['port']
-        self.server = Server('0.0.0.0', port, max_clients=1)  # Limitar a 1 cliente
+        self.server = Server('0.0.0.0', port, max_clients=1)  
         self.server.message_received.connect(self.process_message)
         self.server.client_connected.connect(self.on_client_connected)
         self.server.client_disconnected.connect(self.on_client_disconnected)
         self.server.start()
 
-        # Gerar e exibir código da sala
+
         local_ip = socket.gethostbyname(socket.gethostname())
         room_code = generate_room_code(local_ip, port)
 
-        # Copiar para a área de transferência
+
         clipboard = QApplication.clipboard()
         clipboard.setText(room_code)
 
@@ -248,7 +232,6 @@ class MainWindow(QMainWindow):
                 self.client.disconnected.connect(self.on_disconnected)
                 self.client.start()
                 
-                # Quando conectado, enviar informações do usuário
                 self.send_system_message("user_join", {"username": self.config['username']})
                 
             except Exception as e:
@@ -265,7 +248,7 @@ class MainWindow(QMainWindow):
         else:
             self.peer_connected = False
             self.conn_status.setText("Conectado: Não")
-            # Limpar status de digitação se não houver conexão
+           
             self.typing_label.setText("")
     
     def on_client_connected(self, client_info):
@@ -279,7 +262,7 @@ class MainWindow(QMainWindow):
         self.conn_status.setText("Conectado: Não")
         self.add_system_message("O outro usuário desconectou")
         
-        # Remover usuário da lista e atualizar
+
         for username in list(self.users.keys()):
             if username != self.config['username']:
                 self.users.pop(username, None)
@@ -296,7 +279,6 @@ class MainWindow(QMainWindow):
         self.conn_status.setText("Conectado: Não")
         self.add_system_message("Desconectado da sala")
         
-        # Remover usuário da lista e atualizar
         for username in list(self.users.keys()):
             if username != self.config['username']:
                 self.users.pop(username, None)
@@ -308,8 +290,8 @@ class MainWindow(QMainWindow):
             self.is_typing = True
             self.typing_signal.emit(True)
         
-        # Reiniciar timer a cada alteração do texto
-        self.typing_timer.start(2000)  # 2 segundos sem digitar = não está mais digitando
+        
+        self.typing_timer.start(2000)  
     
     def stop_typing(self):
         """Parar o status de digitação após período de inatividade"""
@@ -329,12 +311,12 @@ class MainWindow(QMainWindow):
     def process_message(self, data):
         """Processa mensagens recebidas (chat ou sistema)"""
         try:
-            # Tentar decodificar como JSON primeiro (mensagens do sistema)
+           
             msg_obj = json.loads(data)
             
-            # Verificar tipo de mensagem do sistema
+            
             if msg_obj.get("type") == "chat":
-                # Mensagem normal de chat, possivelmente criptografada
+               
                 content = msg_obj.get("content", "")
                 if self.encrypted and "encrypted" in msg_obj:
                     content = decrypt_message(content)
@@ -342,35 +324,35 @@ class MainWindow(QMainWindow):
                 self.display_message(msg_obj.get("username", "Anônimo"), content)
                 
             elif msg_obj.get("type") == "user_join":
-                # Novo usuário entrou
+
                 username = msg_obj.get("data", {}).get("username", "Anônimo")
                 if username not in self.users and len(self.users) < self.max_users:
                     self.users[username] = "online"
                     self.update_users_list()
                     self.add_system_message(f"{username} entrou na sala")
                     
-                    # Enviar lista atual de usuários para sincronizar
+                   
                     self.send_system_message("user_list", {"users": self.users})
                     
                 elif len(self.users) >= self.max_users:
-                    # Sala cheia, rejeitar conexão
+                  
                     self.send_system_message("room_full", {})
             
             elif msg_obj.get("type") == "user_list":
-                # Atualizar lista de usuários
+                
                 user_list = msg_obj.get("data", {}).get("users", {})
                 self.users.update(user_list)
                 self.update_users_list()
             
             elif msg_obj.get("type") == "room_full":
-                # Sala está cheia
+               
                 QMessageBox.warning(self, "Sala Cheia", 
                                     "Esta sala já atingiu o limite de 2 usuários.")
                 if self.client:
                     self.client.disconnect()
             
             elif msg_obj.get("type") == "typing_status":
-                # Atualizar status de digitação
+               
                 username = msg_obj.get("data", {}).get("username", "")
                 status = msg_obj.get("data", {}).get("status", "online")
                 
@@ -384,7 +366,6 @@ class MainWindow(QMainWindow):
                         self.typing_label.setText("")
                         
         except json.JSONDecodeError:
-            # Modo de compatibilidade: mensagem formatada no estilo antigo
             parts = data.split(": ", 1)
             if len(parts) == 2:
                 username, message = parts
@@ -414,29 +395,24 @@ class MainWindow(QMainWindow):
         if not text:
             return
             
-        # Parar indicador de digitação
         self.stop_typing()
         
-        # Criar objeto da mensagem
         message = {
             "type": "chat",
             "username": self.config['username'],
             "content": text
         }
         
-        # Criptografar se necessário
         if self.encrypted:
             message["content"] = encrypt_message(text)
             message["encrypted"] = True
         
-        # Enviar e exibir
         payload = json.dumps(message)
         if self.client:
             self.client.send(payload)
         elif self.server:
             self.server.broadcast(payload)
             
-        # Sempre mostrar mensagem decriptografada localmente
         self.display_message(self.config['username'], text, is_own=True)
         self.msg_input.clear()
     
@@ -444,15 +420,12 @@ class MainWindow(QMainWindow):
         """Exibe mensagem de chat em bolhas"""
         bubble = ChatBubble(username, message, is_own)
         
-        # Garantir que haja pelo menos um espaço antes da bolha
         spacer = QWidget()
         spacer.setFixedHeight(5)
         self.chat_layout.addWidget(spacer)
         
-        # Adicionar bolha de chat
         self.chat_layout.addWidget(bubble)
         
-        # Rolar para o final
         self.chat_area.verticalScrollBar().setValue(
             self.chat_area.verticalScrollBar().maximum()
         )

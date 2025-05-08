@@ -10,10 +10,8 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 eggs/
 parts/
-sdist/
 var/
 wheels/
 pip-wheel-metadata/
@@ -25,7 +23,6 @@ share/python-wheels/
 # PyInstaller
 *.manifest
 *.spec
-/dist/
 / build/
 
 # Virtual environment

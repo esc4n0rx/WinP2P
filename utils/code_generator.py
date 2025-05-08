@@ -2,7 +2,7 @@ import random
 import string
 import base64
 
-# Lista de palavras para códigos simples
+
 WORDS = [
     'apple','banana','cherry','delta','echo','foxtrot',
     'golf','hotel','india','juliet','kilo','lima'

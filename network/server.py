@@ -22,15 +22,15 @@ class Server(QThread):
     def run(self):
         self.sock.bind((self.host, self.port))
         self.sock.listen(1)
-        self.sock.settimeout(1)  # Timeout para permitir interrupção limpa
+        self.sock.settimeout(1) 
         
         while self.running:
             try:
                 conn, addr = self.sock.accept()
                 
-                # Verificar limite de clientes
+                
                 if len(self.clients) >= self.max_clients:
-                    # Enviar mensagem de sala cheia e fechar conexão
+                   
                     reject_msg = json.dumps({"type": "room_full"})
                     conn.send(reject_msg.encode())
                     conn.close()
@@ -60,20 +60,18 @@ class Server(QThread):
         
         while self.running:
             try:
-                # Receber dados em buffer
                 chunk = conn.recv(4096)
                 if not chunk:
                     break
                 
                 buffer += chunk
                 
-                # Processar múltiplas mensagens no buffer
                 while b"\n" in buffer:
                     message, buffer = buffer.split(b"\n", 1)
                     if message:
                         self.message_received.emit(message.decode())
                 
-                # Se não há marcador de fim, mas temos dados completos
+               
                 if buffer:
                     self.message_received.emit(buffer.decode())
                     buffer = b""
@@ -84,7 +82,6 @@ class Server(QThread):
                 print(f"Client handler error: {e}")
                 break
         
-        # Limpar quando cliente desconecta
         if conn in self.clients:
             self.clients.remove(conn)
             self.client_disconnected.emit()
@@ -111,7 +108,6 @@ class Server(QThread):
             except:
                 disconnected.append(client)
         
-        # Remover clientes desconectados
         for client in disconnected:
             if client in self.clients:
                 self.clients.remove(client)
@@ -121,14 +117,12 @@ class Server(QThread):
         """Para o servidor e libera recursos"""
         self.running = False
         
-        # Fechar todas as conexões
         for client in self.clients:
             try:
                 client.close()
             except:
                 pass
         
-        # Fechar socket do servidor
         try:
             self.sock.close()
         except:

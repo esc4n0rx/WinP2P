@@ -26,14 +26,12 @@ class StartupWindow(QMainWindow):
         self.setWindowTitle('WinP2P - Menu')
         self.resize(600, 400)
         
-        # Aplicar tema atual
         self.setStyleSheet(THEMES.get(config.get('theme', 'XP'), ''))
 
         central = QWidget()
         self.setCentralWidget(central)
         main_layout = QHBoxLayout(central)
         
-        # Painel esquerdo (decorativo)
         left_panel = QFrame()
         left_panel.setFixedWidth(200)
         left_panel.setFrameShape(QFrame.StyledPanel)
@@ -41,14 +39,12 @@ class StartupWindow(QMainWindow):
         
         left_layout = QVBoxLayout(left_panel)
         
-        # Logo/imagem lateral - placeholder
         logo = QLabel()
         logo_pixmap = QPixmap(150, 150)
         logo_pixmap.fill(Qt.transparent)
         logo.setPixmap(logo_pixmap)
         logo.setAlignment(Qt.AlignCenter)
         
-        # Versão e informações
         info_label = QLabel(
             "<div align='center'>"
             "<h3>WinP2P</h3>"
@@ -62,29 +58,24 @@ class StartupWindow(QMainWindow):
         left_layout.addWidget(info_label)
         left_layout.addStretch()
         
-        # Área principal com botões
         right_panel = QFrame()
         right_layout = QVBoxLayout(right_panel)
         right_layout.setSpacing(20)
         
-        # Título
         title = QLabel("<h1>Bem-vindo ao WinP2P</h1>")
         title.setAlignment(Qt.AlignCenter)
         
-        # Descrição
         description = QLabel(
             "<p>Comunique-se de forma segura e privada com seus contatos.</p>"
             "<p>Escolha uma opção para começar:</p>"
         )
         description.setAlignment(Qt.AlignCenter)
         
-        # Container de botões
         button_container = QFrame()
         button_layout = QVBoxLayout(button_container)
         button_layout.setSpacing(15)
         button_layout.setContentsMargins(50, 20, 50, 20)
         
-        # Botões com ícones (placeholders)
         btn_new = MenuButton("Criar Nova Sala")
         btn_join = MenuButton("Entrar em uma Sala")
         btn_config = MenuButton("Configurações")
@@ -95,28 +86,26 @@ class StartupWindow(QMainWindow):
         button_layout.addWidget(btn_config)
         button_layout.addWidget(btn_about)
         
-        # Conectar ações dos botões
+
         btn_new.clicked.connect(self.new_chat)
         btn_join.clicked.connect(self.join_chat)
         btn_config.clicked.connect(self.open_config)
         btn_about.clicked.connect(self.open_about)
         
-        # Adicionar elementos ao layout principal
         right_layout.addWidget(title)
         right_layout.addWidget(description)
         right_layout.addWidget(button_container)
         right_layout.addStretch()
         
-        # Status do usuário na parte inferior
+
         user_status = QLabel(f"Usuário atual: <b>{config.get('username', 'User')}</b>")
         user_status.setAlignment(Qt.AlignRight)
         right_layout.addWidget(user_status)
         
-        # Adicionar os painéis ao layout principal
+
         main_layout.addWidget(left_panel)
         main_layout.addWidget(right_panel, 1)
         
-        # Armazenar referências às janelas secundárias para evitar coleta de lixo
         self.windows = []
 
     def new_chat(self):
@@ -134,11 +123,11 @@ class StartupWindow(QMainWindow):
     def open_config(self):
         """Abrir janela de configurações"""
         self.config_win = ConfigWindow(self.config)
-        self.windows.append(self.config_win)  # Evitar coleta de lixo
+        self.windows.append(self.config_win)  
         self.config_win.show()
 
     def open_about(self):
         """Abrir janela Sobre"""
         self.about = AboutWindow()
-        self.windows.append(self.about)  # Evitar coleta de lixo
+        self.windows.append(self.about) 
         self.about.show()

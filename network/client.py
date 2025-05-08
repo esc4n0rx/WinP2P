@@ -13,7 +13,7 @@ class Client(QThread):
         self.host = host
         self.port = int(port)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(10)  # 10 segundos de timeout para conexão
+        self.sock.settimeout(10)
         self.running = True
         self._connected = False
     
@@ -23,7 +23,6 @@ class Client(QThread):
             self._connected = True
             self.connected.emit()
             
-            # Iniciar loop de recebimento
             self.receive_thread = threading.Thread(
                 target=self.receive_loop, 
                 daemon=True
@@ -38,24 +37,22 @@ class Client(QThread):
         """Loop de recebimento de mensagens"""
         buffer = b""
         
-        self.sock.settimeout(1)  # Timeout curto para permitir interrupção limpa
+        self.sock.settimeout(1) 
         
         while self.running:
             try:
-                # Receber dados em buffer
+                
                 chunk = self.sock.recv(4096)
                 if not chunk:
                     break
                 
                 buffer += chunk
                 
-                # Processar múltiplas mensagens no buffer
                 while b"\n" in buffer:
                     message, buffer = buffer.split(b"\n", 1)
                     if message:
                         self.message_received.emit(message.decode())
                 
-                # Se não há marcador de fim, mas temos dados completos
                 if buffer:
                     self.message_received.emit(buffer.decode())
                     buffer = b""

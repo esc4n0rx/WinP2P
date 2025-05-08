@@ -4,9 +4,8 @@ import sys
 import shutil
 
 def main():
-    print("=== Vintage P2P Chat - Gerador de Executável ===")
+    print("=== WinP2P Chat - Gerador de Executável ===")
     
-    # Verificar se PyInstaller está instalado
     try:
         subprocess.run([sys.executable, "-m", "PyInstaller", "--version"], 
                       check=True, stdout=subprocess.PIPE)
@@ -15,12 +14,10 @@ def main():
         print("Execute: pip install pyinstaller")
         return
     
-    # Criar diretórios necessários se não existirem
     os.makedirs("logs", exist_ok=True)
     os.makedirs("config", exist_ok=True)
     os.makedirs("received_files", exist_ok=True)
     
-    # Verificar se o arquivo de configuração existe, criar se não
     if not os.path.exists("config.json"):
         import json
         default_config = {
@@ -38,39 +35,34 @@ def main():
         with open("config.json", "w") as f:
             json.dump(default_config, f, indent=4)
     
-    # Definir comando PyInstaller
     print("\nConfigurando PyInstaller...")
     
     pyinstaller_command = [
         sys.executable, "-m", "PyInstaller",
-        "--name=VintageChat",
-        "--windowed",  # GUI sem console
-        "--onefile",   # Único arquivo executável
-        "--add-data=config.json;.",  # Incluir arquivo de configuração
+        "--name=WinP2P",
+        "--windowed",  
+        "--onefile",   
+        "--add-data=config.json;.",  
         "--icon=resources/icon.ico" if os.path.exists("resources/icon.ico") else "",
-        "main.py"  # Script principal
+        "main.py" 
     ]
     
-    # Remover opção de ícone se não existir
     if not os.path.exists("resources/icon.ico"):
         print("Aviso: Arquivo de ícone não encontrado. O executável usará o ícone padrão.")
         pyinstaller_command = [cmd for cmd in pyinstaller_command if not cmd.startswith("--icon")]
     
-    # Executar PyInstaller
     print("\nGerando executável... (isso pode levar alguns minutos)")
     try:
         subprocess.run(pyinstaller_command, check=True)
         
-        # Copiar diretórios necessários para a pasta dist
         print("\nCopiando arquivos adicionais...")
-        if os.path.exists("dist/VintageChat"):
-            # Para --onedir
-            os.makedirs("dist/VintageChat/logs", exist_ok=True)
-            os.makedirs("dist/VintageChat/config", exist_ok=True)
-            os.makedirs("dist/VintageChat/received_files", exist_ok=True)
+        if os.path.exists("dist/WinP2P"):
+            os.makedirs("dist/WinP2P/logs", exist_ok=True)
+            os.makedirs("dist/WinP2P/config", exist_ok=True)
+            os.makedirs("dist/WinP2P/received_files", exist_ok=True)
         
         print("\n=== Processo concluído com sucesso! ===")
-        print("O executável foi criado em: dist/VintageChat.exe")
+        print("O executável foi criado em: dist/WinP2P.exe")
         print("\nObservações:")
         print("1. Ao distribuir, inclua as pastas 'logs', 'config' e 'received_files'")
         print("2. Para personalizar o ícone, adicione um arquivo 'icon.ico' na pasta 'resources'")
