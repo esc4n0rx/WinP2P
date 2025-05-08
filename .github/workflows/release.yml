@@ -3,7 +3,10 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'  # Acionado quando uma tag começando com 'v' é enviada
+      - 'v*'  
+
+permissions:
+  contents: write  
 
 jobs:
   build:
