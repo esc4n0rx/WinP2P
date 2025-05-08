@@ -22,8 +22,8 @@ WinP2P é aplicativo de chat ponto-a-ponto (P2P) com interfaces inspiradas em de
 
 1. Clone o repositório:
    ```
-   git clone https://github.com/esc4n0rx/pp
-   cd pp
+   git clone https://github.com/esc4n0rx/WinP2P
+   cd WinP2P
    ```
 
 2. Crie e ative um ambiente virtual (opcional, mas recomendado):
@@ -60,7 +60,7 @@ python main.py
 ## Estrutura do Projeto
 
 ```
-pp/
+WinP2P/
 ├── main.py              # Ponto de entrada do aplicativo
 ├── config.json          # Arquivo de configuração
 ├── requirements.txt     # Dependências
