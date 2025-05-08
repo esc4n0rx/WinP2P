@@ -1,52 +1,144 @@
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel
+from PyQt5.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel,
+    QHBoxLayout, QFrame, QSizePolicy, QSpacerItem
+)
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QIcon, QPixmap, QFont, QColor, QPalette
 from ui.main_window import MainWindow
 from ui.config_window import ConfigWindow
 from ui.about_window import AboutWindow
+from ui.themes import THEMES
+
+class MenuButton(QPushButton):
+    """Botão estilizado para o menu principal"""
+    def __init__(self, text, parent=None):
+        super().__init__(text, parent)
+        self.setMinimumHeight(50)
+        self.setMinimumWidth(200)
+        font = QFont()
+        font.setPointSize(11)
+        self.setFont(font)
 
 class StartupWindow(QMainWindow):
     def __init__(self, config):
         super().__init__()
         self.config = config
-        self.setWindowTitle('Vintage P2P Chat - Menu')
-        self.resize(300, 200)
+        self.setWindowTitle('WinP2P - Menu')
+        self.resize(600, 400)
+        
+        # Aplicar tema atual
+        self.setStyleSheet(THEMES.get(config.get('theme', 'XP'), ''))
 
         central = QWidget()
         self.setCentralWidget(central)
-        layout = QVBoxLayout(central)
-        layout.setSpacing(10)
-
-        title = QLabel('<h2>Vintage P2P Chat</h2>')
-        layout.addWidget(title)
-
-        btn_new = QPushButton('Novo Chat')
-        btn_join = QPushButton('Entrar em uma Sala')
-        btn_config = QPushButton('Configurações')
-        btn_about = QPushButton('Sobre')
-
-        layout.addWidget(btn_new)
-        layout.addWidget(btn_join)
-        layout.addWidget(btn_config)
-        layout.addWidget(btn_about)
-
+        main_layout = QHBoxLayout(central)
+        
+        # Painel esquerdo (decorativo)
+        left_panel = QFrame()
+        left_panel.setFixedWidth(200)
+        left_panel.setFrameShape(QFrame.StyledPanel)
+        left_panel.setFrameShadow(QFrame.Raised)
+        
+        left_layout = QVBoxLayout(left_panel)
+        
+        # Logo/imagem lateral - placeholder
+        logo = QLabel()
+        logo_pixmap = QPixmap(150, 150)
+        logo_pixmap.fill(Qt.transparent)
+        logo.setPixmap(logo_pixmap)
+        logo.setAlignment(Qt.AlignCenter)
+        
+        # Versão e informações
+        info_label = QLabel(
+            "<div align='center'>"
+            "<h3>WinP2P</h3>"
+            "<p>Versão 0.1</p>"
+            "<p>Desenvolvido em Python</p>"
+            "</div>"
+        )
+        info_label.setAlignment(Qt.AlignCenter)
+        
+        left_layout.addWidget(logo)
+        left_layout.addWidget(info_label)
+        left_layout.addStretch()
+        
+        # Área principal com botões
+        right_panel = QFrame()
+        right_layout = QVBoxLayout(right_panel)
+        right_layout.setSpacing(20)
+        
+        # Título
+        title = QLabel("<h1>Bem-vindo ao WinP2P</h1>")
+        title.setAlignment(Qt.AlignCenter)
+        
+        # Descrição
+        description = QLabel(
+            "<p>Comunique-se de forma segura e privada com seus contatos.</p>"
+            "<p>Escolha uma opção para começar:</p>"
+        )
+        description.setAlignment(Qt.AlignCenter)
+        
+        # Container de botões
+        button_container = QFrame()
+        button_layout = QVBoxLayout(button_container)
+        button_layout.setSpacing(15)
+        button_layout.setContentsMargins(50, 20, 50, 20)
+        
+        # Botões com ícones (placeholders)
+        btn_new = MenuButton("Criar Nova Sala")
+        btn_join = MenuButton("Entrar em uma Sala")
+        btn_config = MenuButton("Configurações")
+        btn_about = MenuButton("Sobre")
+        
+        button_layout.addWidget(btn_new)
+        button_layout.addWidget(btn_join)
+        button_layout.addWidget(btn_config)
+        button_layout.addWidget(btn_about)
+        
+        # Conectar ações dos botões
         btn_new.clicked.connect(self.new_chat)
         btn_join.clicked.connect(self.join_chat)
         btn_config.clicked.connect(self.open_config)
         btn_about.clicked.connect(self.open_about)
+        
+        # Adicionar elementos ao layout principal
+        right_layout.addWidget(title)
+        right_layout.addWidget(description)
+        right_layout.addWidget(button_container)
+        right_layout.addStretch()
+        
+        # Status do usuário na parte inferior
+        user_status = QLabel(f"Usuário atual: <b>{config.get('username', 'User')}</b>")
+        user_status.setAlignment(Qt.AlignRight)
+        right_layout.addWidget(user_status)
+        
+        # Adicionar os painéis ao layout principal
+        main_layout.addWidget(left_panel)
+        main_layout.addWidget(right_panel, 1)
+        
+        # Armazenar referências às janelas secundárias para evitar coleta de lixo
+        self.windows = []
 
     def new_chat(self):
+        """Iniciar nova sala de chat"""
         self.main = MainWindow(self.config, new_room=True)
         self.main.show()
         self.close()
 
     def join_chat(self):
+        """Juntar-se a uma sala existente"""
         self.main = MainWindow(self.config, new_room=False)
         self.main.show()
         self.close()
 
     def open_config(self):
+        """Abrir janela de configurações"""
         self.config_win = ConfigWindow(self.config)
+        self.windows.append(self.config_win)  # Evitar coleta de lixo
         self.config_win.show()
 
     def open_about(self):
+        """Abrir janela Sobre"""
         self.about = AboutWindow()
+        self.windows.append(self.about)  # Evitar coleta de lixo
         self.about.show()
