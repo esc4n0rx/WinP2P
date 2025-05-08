@@ -22,7 +22,7 @@ class AboutWindow(QMainWindow):
         logo_pixel.fill(Qt.transparent)
         logo.setPixmap(logo_pixel)
         
-        title_text = QLabel('<h1>WinP2P</h1><h3>Versão 0.1</h3>')
+        title_text = QLabel('<h1>WinP2P</h1><h3>Versão 0.2.0</h3>')
         title_text.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         
         title_layout.addWidget(logo)

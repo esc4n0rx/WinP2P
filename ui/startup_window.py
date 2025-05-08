@@ -7,6 +7,7 @@ from PyQt5.QtGui import QIcon, QPixmap, QFont, QColor, QPalette
 from ui.main_window import MainWindow
 from ui.config_window import ConfigWindow
 from ui.about_window import AboutWindow
+from ui.update_window import UpdateWindow
 from ui.themes import THEMES
 
 class MenuButton(QPushButton):
@@ -48,7 +49,7 @@ class StartupWindow(QMainWindow):
         info_label = QLabel(
             "<div align='center'>"
             "<h3>WinP2P</h3>"
-            "<p>Versão 0.1</p>"
+            "<p>Versão 0.2.0</p>"
             "<p>Desenvolvido em Python</p>"
             "</div>"
         )
@@ -79,17 +80,20 @@ class StartupWindow(QMainWindow):
         btn_new = MenuButton("Criar Nova Sala")
         btn_join = MenuButton("Entrar em uma Sala")
         btn_config = MenuButton("Configurações")
+        btn_update = MenuButton("Verificar Atualizações")
         btn_about = MenuButton("Sobre")
         
         button_layout.addWidget(btn_new)
         button_layout.addWidget(btn_join)
         button_layout.addWidget(btn_config)
+        button_layout.addWidget(btn_update)
         button_layout.addWidget(btn_about)
         
 
         btn_new.clicked.connect(self.new_chat)
         btn_join.clicked.connect(self.join_chat)
         btn_config.clicked.connect(self.open_config)
+        btn_update.clicked.connect(self.check_updates)
         btn_about.clicked.connect(self.open_about)
         
         right_layout.addWidget(title)
@@ -107,6 +111,11 @@ class StartupWindow(QMainWindow):
         main_layout.addWidget(right_panel, 1)
         
         self.windows = []
+        
+        # Verificar atualizações automaticamente na inicialização
+        if config.get('check_updates_at_startup', True):
+            from ui.update_window import UpdateWindow
+            UpdateWindow.check_for_updates_on_startup(self, config)
 
     def new_chat(self):
         """Iniciar nova sala de chat"""
@@ -125,6 +134,12 @@ class StartupWindow(QMainWindow):
         self.config_win = ConfigWindow(self.config)
         self.windows.append(self.config_win)  
         self.config_win.show()
+    
+    def check_updates(self):
+        """Abrir janela de atualizações"""
+        self.update_win = UpdateWindow(self.config, self)
+        self.windows.append(self.update_win)
+        self.update_win.show()
 
     def open_about(self):
         """Abrir janela Sobre"""

@@ -14,7 +14,7 @@ class ConfigWindow(QMainWindow):
         super().__init__()
         self.config = config
         self.setWindowTitle('Configurações')
-        self.resize(400, 500)
+        self.resize(400, 550)  # Aumentado para acomodar nova seção
 
         if 'theme' in config:
             self.setStyleSheet(THEMES.get(config['theme'], ''))
@@ -95,6 +95,15 @@ class ConfigWindow(QMainWindow):
         security_layout.addRow('Criptografia:', self.encryption)
         security_layout.addRow('Senha da Sala:', self.room_password)
         
+        # Nova seção para atualizações
+        updates_group = QGroupBox("Atualizações")
+        updates_layout = QFormLayout(updates_group)
+        
+        self.check_updates = QCheckBox()
+        self.check_updates.setChecked(config.get('check_updates_at_startup', True))
+        
+        updates_layout.addRow('Verificar Atualizações ao Iniciar:', self.check_updates)
+        
         btn_layout = QHBoxLayout()
         
         self.btn_reset = QPushButton("Restaurar Padrões")
@@ -109,10 +118,12 @@ class ConfigWindow(QMainWindow):
         btn_layout.addStretch()
         btn_layout.addWidget(self.btn_cancel)
         btn_layout.addWidget(self.btn_save)
+        
         main_layout.addWidget(profile_group)
         main_layout.addWidget(network_group)
         main_layout.addWidget(ui_group)
         main_layout.addWidget(security_group)
+        main_layout.addWidget(updates_group)  # Adiciona a nova seção
         main_layout.addLayout(btn_layout)
         
         self.theme.currentTextChanged.connect(self.preview_theme)
@@ -140,7 +151,8 @@ class ConfigWindow(QMainWindow):
             'encryption': True,
             'timeout': 30,
             'avatar_color': '#1E88E5',
-            'room_password': ''
+            'room_password': '',
+            'check_updates_at_startup': True
         }
         
         self.username.setText(default_config['username'])
@@ -154,6 +166,7 @@ class ConfigWindow(QMainWindow):
         self.current_color = default_config['avatar_color']
         self.avatar_color.setStyleSheet(f"background-color: {self.current_color}")
         self.room_password.setText(default_config['room_password'])
+        self.check_updates.setChecked(default_config['check_updates_at_startup'])
         
         self.setStyleSheet(THEMES.get(default_config['theme'], ''))
     
@@ -169,6 +182,7 @@ class ConfigWindow(QMainWindow):
         self.config['timeout'] = self.timeout.value()
         self.config['avatar_color'] = self.current_color
         self.config['room_password'] = self.room_password.text()
+        self.config['check_updates_at_startup'] = self.check_updates.isChecked()
         
         try:
             with open('config.json', 'w') as f:
